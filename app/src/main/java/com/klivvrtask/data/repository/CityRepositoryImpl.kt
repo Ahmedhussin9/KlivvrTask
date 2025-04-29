@@ -1,11 +1,14 @@
 package com.klivvrtask.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.klivvrtask.data.trie.City
 import com.klivvrtask.data.trie.CityTrie
 import com.klivvrtask.domain.repository.CityRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.decodeToSequence
 import javax.inject.Inject
 
@@ -14,22 +17,28 @@ class CityRepositoryImpl @Inject constructor(
 ) : CityRepository {
     private val cityTrie = CityTrie()
 
+    @OptIn(ExperimentalSerializationApi::class)
     override suspend fun loadCities(): Boolean {
         return try {
-            val json = context.assets.open("cities.json")
-                .bufferedReader()
-                .use { it.readText() }
+            Log.e("track", "Started", )
 
-            val cities = Json.decodeFromString<List<City>>(json)
+            val inputStream = context.assets.open("cities.json")
+            val cities = Json.decodeFromStream<List<City>>(inputStream)
+
+            Log.e("track", "Json process", )
+
             cities.forEach { cityTrie.insert(it) }
+
+            Log.e("track", "Cities here", )
             true
         } catch (e: Exception) {
             e.printStackTrace()
+            Log.e("track", e.message.toString(), )
             false
         }
     }
 
-    override suspend fun searchCities(prefix: String): List<City> {
+    override fun searchCities(prefix: String): List<City> {
         return cityTrie.search(prefix)
     }
 }

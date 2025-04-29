@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import com.klivvrtask.presentaion.screens.SearchScreenSetup
 import com.klivvrtask.ui.theme.KlivvrTaskTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -35,6 +36,8 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
+                        SearchScreenSetup()
+
                     }
                 }
             }
