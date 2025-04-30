@@ -2,6 +2,7 @@ package com.klivvrtask.presentaion.composable
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -32,57 +35,74 @@ import com.klivvrtask.data.trie.Coord
 @Composable
 fun CityCard(city: City) {
     val context = LocalContext.current
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Canvas(
+            modifier = Modifier
+                .width(52.dp) // aligns with sticky header
+                .height(100.dp)
+                .padding(top = 0.dp)
+        ) {
+            val lineX = size.width / 2
+            drawLine(
+                color = Color.Gray,
+                start = Offset(x = lineX, y = 0f),
+                end = Offset(x = lineX, y = size.height),
+                strokeWidth = 5f
+            )
+        }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 48.dp, end = 16.dp, top = 8.dp, bottom = 8.dp)
-            .clickable {
-                val uri = Uri.parse("geo:${city.coord.lat},${city.coord.lon}?q=${city.name}")
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                intent.setPackage("com.google.android.apps.maps")
-                context.startActivity(intent)
-            },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(end = 16.dp, top = 8.dp, bottom = 8.dp)
+                .clickable {
+                    val uri = Uri.parse("geo:${city.coord.lat},${city.coord.lon}?q=${city.name}")
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    intent.setPackage("com.google.android.apps.maps")
+                    context.startActivity(intent)
+                },
+            shape = RoundedCornerShape(12.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
-            Box(
+            Row(
                 modifier = Modifier
-                    .size(48.dp)
-                    .background(Color(0xFFE0DFE1), CircleShape),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = city.country,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.DarkGray
-                )
-            }
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(Color(0xFFE0DFE1), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = city.country,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.DarkGray
+                    )
+                }
 
-            Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-            Column {
-                Text(
-                    text = "${city.name}, ${city.country}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = "${city.coord.lat}, ${city.coord.lon}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
+                Column {
+                    Text(
+                        text = "${city.name}, ${city.country}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "${city.coord.lat}, ${city.coord.lon}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                }
             }
         }
     }
+
 }
 
 @Preview(showBackground = true)

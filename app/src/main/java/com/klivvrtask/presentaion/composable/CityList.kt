@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -53,7 +54,7 @@ fun CityListWithTimeline(modifier: Modifier = Modifier, cities: List<City>) {
                     text = "${cities.size} cities",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
-                        .padding(start = 24.dp, top = 16.dp, bottom = 8.dp)
+                        .padding(top = 16.dp, bottom = 8.dp)
                 )
             }
 
@@ -61,8 +62,8 @@ fun CityListWithTimeline(modifier: Modifier = Modifier, cities: List<City>) {
 
         grouped.forEach { (initial, cityList) ->
             stickyHeader {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                Column (
+                    horizontalAlignment = Alignment.Start,
                     modifier = Modifier.padding(start = 12.dp,top = 16.dp, bottom = 8.dp)
                 ) {
                     Box(
@@ -78,14 +79,6 @@ fun CityListWithTimeline(modifier: Modifier = Modifier, cities: List<City>) {
                             fontWeight = FontWeight.Bold
                         )
                     }
-
-                    HorizontalDivider(
-                        modifier = Modifier
-                            .height(1.dp)
-                            .weight(1f)
-                            .padding(start = 8.dp, end = 24.dp),
-                        color = Color.LightGray
-                    )
                 }
             }
 
