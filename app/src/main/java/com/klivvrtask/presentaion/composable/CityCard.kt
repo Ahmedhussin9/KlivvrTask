@@ -38,7 +38,7 @@ fun CityCard(city: City) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Canvas(
             modifier = Modifier
-                .width(52.dp) // aligns with sticky header
+                .width(52.dp)
                 .height(100.dp)
                 .padding(top = 0.dp)
         ) {

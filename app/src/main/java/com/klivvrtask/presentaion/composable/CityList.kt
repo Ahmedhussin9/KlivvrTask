@@ -41,7 +41,7 @@ fun CityListWithTimeline(modifier: Modifier = Modifier, cities: List<City>) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White) // light gray background
+            .background(Color.White)
     ) {
 
         item {
