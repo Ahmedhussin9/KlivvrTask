@@ -77,12 +77,7 @@ fun CityCard(city: City) {
                         .background(Color(0xFFE0DFE1), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = city.country,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.DarkGray
-                    )
+                    CountryFlag(countryCode = city.country)
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
