@@ -20,16 +20,14 @@ class CityRepositoryImpl @Inject constructor(
     @OptIn(ExperimentalSerializationApi::class)
     override suspend fun loadCities(): Boolean {
         return try {
-            Log.e("track", "Started", )
+
 
             val inputStream = context.assets.open("cities.json")
             val cities = Json.decodeFromStream<List<City>>(inputStream)
 
-            Log.e("track", "Json process", )
 
             cities.forEach { cityTrie.insert(it) }
 
-            Log.e("track", "Cities here", )
             true
         } catch (e: Exception) {
             e.printStackTrace()

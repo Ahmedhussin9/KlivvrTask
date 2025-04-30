@@ -1,78 +1,92 @@
 package com.klivvrtask.presentaion.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.klivvrtask.data.trie.City
 import com.klivvrtask.presentaion.composable.AnimatedSearchBar
-import com.klivvrtask.presentaion.composable.CityList
+import com.klivvrtask.presentaion.composable.CityListWithTimeline
 
 @Composable
 fun SearchScreenSetup(
     viewModel: SearchViewModel = hiltViewModel(),
-//    navController: NavController
 ) {
-    val uiState = viewModel.uiState
-    SearchScreenContent(uiState = uiState, onEvent = viewModel::onEvent, onCityClick = {
-
-    })
-
+    val uiState by viewModel.uiState.collectAsState()
+    SearchScreenContent(uiState = uiState, onEvent = viewModel::onEvent)
 }
 
 @Composable
 fun SearchScreenContent(
     uiState: SearchScreenUiState,
     onEvent: (SearchEvents) -> Unit,
-    onCityClick: (City) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        onEvent(SearchEvents.LoadData)
-    }
-    Column(modifier = Modifier.padding(10.dp).fillMaxSize()) {
-        AnimatedSearchBar(
-            query = uiState.searchQuery,
-            onQueryChanged = { onEvent.invoke(SearchEvents.OnSearchQueryChanged(it)) })
-        Spacer(modifier = Modifier.height(8.dp))
-        when {
-            uiState.isLoading -> {
-                AnimatedVisibility(visible = true) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                }
-            }
 
-            uiState.cityResults.isEmpty() -> {
-                AnimatedVisibility(visible = true) {
-                    Text(
-                        text = "No results found",
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            when {
+                uiState.isLoading -> {
+                    AnimatedVisibility(visible = true) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                        )
+                    }
                 }
-            }
 
-            else -> {
-                CityList(cities = uiState.cityResults)
+                uiState.cityResults.isEmpty() -> {
+                    AnimatedVisibility(visible = true) {
+                        Text(
+                            text = "No results found",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+
+                else -> {
+                    CityListWithTimeline(modifier = Modifier.fillMaxSize(), cities = uiState.cityResults)
+                }
             }
         }
+        AnimatedSearchBar(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            query = uiState.searchQuery,
+            enabled = !uiState.isLoading,
+            onQueryChanged = { onEvent.invoke(SearchEvents.OnSearchQueryChanged(it)) })
     }
+
 }
 
 
+
+
+
 @Composable
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showBackground = true)
 fun SearchScreenPreview() {
-    SearchScreenContent(uiState = SearchScreenUiState(), onEvent = {}, onCityClick = {})
+    SearchScreenContent(uiState = SearchScreenUiState(), onEvent = {})
 
 }

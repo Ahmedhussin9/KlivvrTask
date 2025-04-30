@@ -1,15 +1,16 @@
 package com.klivvrtask.presentaion.screens
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.klivvrtask.data.trie.City
 import com.klivvrtask.domain.repository.CityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -18,17 +19,23 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val cityRepository: CityRepository
 ) : ViewModel() {
-    var uiState by mutableStateOf(SearchScreenUiState())
-        private set
+    private val _uiState = MutableStateFlow(SearchScreenUiState())
+    val uiState: StateFlow<SearchScreenUiState> = _uiState
 
+
+    init {
+        loadCities()
+    }
     fun onEvent(events: SearchEvents) {
         when (events) {
             is SearchEvents.OnSearchQueryChanged -> {
-                val result = cityRepository.searchCities(events.query)
-                uiState = uiState.copy(
-                    searchQuery = events.query,
-                    cityResults = result
-                )
+                val query = events.query
+                val result = if (query.isBlank()) {
+                    emptyList()
+                } else {
+                    cityRepository.searchCities(query)
+                }
+                _uiState.update { it.copy(searchQuery = events.query, cityResults = result) }
             }
 
             is SearchEvents.LoadData -> {
@@ -37,21 +44,17 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun loadCities() {
-        viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.Main) {
-                uiState = uiState.copy(
-                    isLoading = true
-                )
+    private fun loadCities() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val result = withContext(Dispatchers.IO) {
+                cityRepository.loadCities()
             }
-            withContext(Dispatchers.Default){
-                val result = cityRepository.loadCities()
-                uiState = uiState.copy(
+            _uiState.update {
+                it.copy(
                     isLoading = false,
-                    error = if (result) null else "Failed to load cities",
-
+                    error = if (result) null else "Failed to load cities"
                 )
-
             }
         }
     }
